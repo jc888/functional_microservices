@@ -4,18 +4,22 @@ var sub = context.socket('SUBSCRIBE');
 
 var stateful = {
     users: [
-        { id: 1, name: 'jack' },
-        { id: 2, name: 'jack' },
-        { id: 3, name: 'john' }
+        { id: 1, name: 'jack', countryId: 1 },
+        { id: 2, name: 'jack', countryId: 2 },
+        { id: 3, name: 'john', countryId: 2 }
     ],
     countries: [
-        { name: "denmark", population: 3000 },
-        { name: "poland", population: 2000 },
+        { id: 1, name: "france", population: 3000 },
+        { id: 2, name: "germany", population: 2000 },
     ]
 }
 
 function getUsers() {
     return stateful.users;
+}
+
+function getCountries() {
+    return stateful.countries;
 }
 
 function filterByName(name, data) {
@@ -29,9 +33,35 @@ function filterByName(name, data) {
     return resp;
 }
 
+function extractCountryIds(data) {
+    var resp = [];
+    for (i in data) {
+        var entry = data[i];
+        resp.push(entry.countryId);
+    }
+    return resp;
+}
+
+function filterByCountryIds(countryIds, data) {
+    var resp = [];
+    for (i in data) {
+        var entry = data[i];
+        for (j in countryIds) {
+            var countryId = countryIds[j];
+            if (entry.countryId == countryId) {
+                resp.push(entry);
+            }
+        }
+    }
+    return resp;
+}
+
+
 function process(criteria) {
     var users = getUsers();
-    var result = filterByName(criteria.name, users);
+    var people = filterByName(criteria.name, users);
+    var countryIds = extractCountryIds(people);
+    
     return result;
 }
 

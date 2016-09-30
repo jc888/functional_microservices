@@ -4,21 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -w"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.4.6",
-    "busmq": "^1.6.0",
     "express": "^4.14.0",
     "highland": "^2.10.0",
     "mocha": "^3.0.2",
     "rabbit.js": "^0.4.4",
-    "ramda": "^0.22.1",
-    "redis": "^2.6.2",
-    "redis-streams": "^1.1.0",
-    "rsmq": "^0.7.1",
+    "ramda-fantasy": "^0.7.0",
     "supertest": "^2.0.0"
   },
   "devDependencies": {

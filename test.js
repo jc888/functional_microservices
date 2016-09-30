@@ -1,5 +1,5 @@
 var request = require('supertest');
-var app = require('./example1');
+var app = require('./example2');
 
 describe('GET /', function() {
   it('respond with json', function(done) {
