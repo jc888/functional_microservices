@@ -1,17 +1,19 @@
 var Future = require('ramda-fantasy').Future;
 var Identity = require('ramda-fantasy').Identity;
+var Maybe = require('ramda-fantasy').Maybe;
+var Reader = require('ramda-fantasy').Reader;
+
 var R = require('ramda');
 var rabbitjs = require('rabbit.js');
 var express = require('express');
 var app = express();
 
 var url = 'amqp://localhost:5672';
-var BusA = R.always(rabbitjs.createContext(url));
-var BusB = R.always(rabbitjs.createContext(url));
 var createSocketByType = (contextFunc, type) => contextFunc().socket(type);
 var connectSocket = R.curry((socket, queue) => Future((reject, resolve) => socket.connect(queue, resolve)).map(() => socket));
-var onDataSocket = (socket) => Future((reject, resolve) => socket.on('data', resolve));
-
+var onDataFromSocket = (socket) => Future((reject, resolve) => socket.on('data', resolve));
+var sendDataThroughSocket = R.curry((encoding, socket, data) => socket.write(data, encoding));
+var closeSubscription = R.curry((socket, data) => socket.close());
 
 var stateful = {
     users: [
@@ -75,33 +77,47 @@ function process(criteria) {
     return countryIds;
 }
 
+var BusB = R.always(rabbitjs.createContext(url));
 var subB = createSocketByType(BusB, 'SUBSCRIBE');
 var pubB = createSocketByType(BusB, 'PUBLISH');
 
-connectSocket(subB, 'toWorker')
-    .chain(subB => onDataSocket(subB))
+Future.of()
+    .chain(() => connectSocket(subB, 'toWorker'))
+    .chain(() => connectSocket(pubB, 'fromWorker'))
+    .chain(() => onDataFromSocket(subB))
     .map(JSON.parse)
     .map(process)
-    .chain(data => {
-        return connectSocket(pubB, 'fromWorker')
-            .map(pubB => pubB.write(JSON.stringify(data), 'utf8'))
-            .map(() => subB.close());
-    })
+    .map(JSON.stringify)
+    .map(sendDataThroughSocket('utf8', pubB))
+    .map(closeSubscription(subB))
     .fork(err => console.log(err), () => {});
 
 app.get('/:name', function(req, res) {
+    var BusA = R.always(rabbitjs.createContext(url));
     var subA = createSocketByType(BusA, 'SUBSCRIBE');
     var pubA = createSocketByType(BusA, 'PUBLISH');
+    var dispatch = (data) => res.json(data);
 
-    onDataSocket(subA)
+    var safeGetMessage = Maybe.Just(req)
+        .map(R.prop('params'))
+        .map(R.prop('name'))
+        .map(R.objOf('name'))
+        .map(JSON.stringify)
+
+    //channel listener
+    Future.of()
+        .chain(() => connectSocket(subA, 'fromWorker'))
+        .chain(() => onDataFromSocket(subA))
         .map(JSON.parse)
-        .map(data => res.json(data))
-        .map(() => subA.close())
+        .map(dispatch)
+        .map(closeSubscription(subA))
         .fork(err => console.log(err), () => {});
 
-    connectSocket(subA, 'fromWorker')
+    //channel sender
+    Future((reject, resolve) => setTimeout(resolve, 100))
         .chain(() => connectSocket(pubA, 'toWorker'))
-        .map(pubA => pubA.write(JSON.stringify({ name: req.params.name }), 'utf8'))
+        .map(() => safeGetMessage.getOrElse())
+        .map(sendDataThroughSocket('utf8', pubA))
         .fork(err => console.log(err), () => {});
 });
 

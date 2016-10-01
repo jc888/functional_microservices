@@ -8,7 +8,7 @@ describe('GET /', function() {
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .end((err,res)=>{
-      	console.log(res.body);
+      	console.log('test recieved',res.body);
        if (err) return done(err);
         done();
       })
