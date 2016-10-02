@@ -2,6 +2,7 @@ var Future = require('ramda-fantasy').Future;
 var Identity = require('ramda-fantasy').Identity;
 var Maybe = require('ramda-fantasy').Maybe;
 var Reader = require('ramda-fantasy').Reader;
+var IO = require('ramda-fantasy').IO;
 
 var R = require('ramda');
 var rabbitjs = require('rabbit.js');
@@ -9,10 +10,14 @@ var express = require('express');
 var app = express();
 
 var url = 'amqp://localhost:5672';
-var createSocketByType = (contextFunc, type) => contextFunc().socket(type);
+var createSocketByType = R.curry((type, context) => context.socket(type));
 var connectSocket = R.curry((socket, queue) => Future((reject, resolve) => socket.connect(queue, resolve)).map(() => socket));
+var connectSocket2 = R.curry((queue, socket) => Future((reject, resolve) => socket.connect(queue, resolve)).map(() => socket));
+
 var onDataFromSocket = (socket) => Future((reject, resolve) => socket.on('data', resolve));
 var sendDataThroughSocket = R.curry((encoding, socket, data) => socket.write(data, encoding));
+var sendDataThroughSocket2 = R.curry((encoding, socket, data) => socket.write(data, encoding));
+
 var closeSubscription = R.curry((socket, data) => socket.close());
 
 var stateful = {
@@ -77,26 +82,38 @@ function process(criteria) {
     return countryIds;
 }
 
-var BusB = R.always(rabbitjs.createContext(url));
-var subB = createSocketByType(BusB, 'SUBSCRIBE');
-var pubB = createSocketByType(BusB, 'PUBLISH');
+var BusB = Identity(rabbitjs.createContext(url));
+
+var subB = BusB
+    .map(createSocketByType('SUBSCRIBE'));
+
+var pubB = BusB
+    .map(createSocketByType('PUBLISH'));
 
 Future.of()
-    .chain(() => connectSocket(subB, 'toWorker'))
-    .chain(() => connectSocket(pubB, 'fromWorker'))
-    .chain(() => onDataFromSocket(subB))
+    .chain(() => subB.map(connectSocket2('toWorker')).get())
+    .chain(() => pubB.map(connectSocket2('fromWorker')).get())
+    .chain(() => subB.map(onDataFromSocket).get())
     .map(JSON.parse)
     .map(process)
     .map(JSON.stringify)
-    .map(sendDataThroughSocket('utf8', pubB))
-    .map(closeSubscription(subB))
+    .map(data => pubB.map(sendDataThroughSocket2('utf8')))
+    .map(closeSubscription(subB.get()))
     .fork(err => console.log(err), () => {});
 
 app.get('/:name', function(req, res) {
-    var BusA = R.always(rabbitjs.createContext(url));
-    var subA = createSocketByType(BusA, 'SUBSCRIBE');
-    var pubA = createSocketByType(BusA, 'PUBLISH');
-    var dispatch = (data) => res.json(data);
+
+    var BusA = Identity(rabbitjs.createContext(url));
+
+    var subA = BusA
+        .map(createSocketByType('SUBSCRIBE'))
+        .get();
+
+    var pubA = BusA
+        .map(createSocketByType('PUBLISH'))
+        .get();
+
+    var dispatch = data => res.send(data);
 
     var safeGetMessage = Maybe.Just(req)
         .map(R.prop('params'))
