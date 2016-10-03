@@ -88,6 +88,53 @@ var createQueue = R.curry(createQueueWithClient)(rsmq);
 var popMessage = R.curry(popMessageWithClient)(rsmq);
 var sendMessage = R.curry(sendMessageWithClient)(rsmq);
 
+/******
+ * functional Mongo
+ *******/
+
+var MongoClient = require('mongodb').MongoClient
+
+var url = 'mongodb://localhost:27017/microservices';
+
+var connectDb = (url) => Future((reject, resolve) =>
+    MongoClient.connect(url, (err, db) => err ? reject(err) : resolve(db)))
+
+var collectionFind = R.curry((query, collection) =>
+    Future((reject, resolve) => collection.find(query).toArray((err, docs) => err ? reject(err) : resolve(docs))))
+
+var collectionInsert = R.curry((query, collection) =>
+    Future((reject, resolve) => collection.insertMany(query, (err, docs) => err ? reject(err) : resolve(docs))))
+
+var collectionRemove = R.curry((query, collection) =>
+    Future((reject, resolve) => collection.remove(query, (err, docs) => err ? reject(err) : resolve(docs))))
+
+var connectedDb = connectDb(url)
+
+var tapCloseDb = data => connectedDb.map(db => db.close).map(() => data);
+
+/***
+ * Mongo process chain
+ ****/
+
+var emptyUsers = () => connectedDb
+    .map(db => db.collection('users'))
+    .chain(collectionRemove({}))
+    .map(R.prop('result'))
+
+var insertUsers = () => connectedDb
+    .map(db => db.collection('users'))
+    .chain(collectionInsert([{ name: 'stuff' }, { name: 'stuff2' }]))
+    .map(R.prop('insertedCount'))
+
+var findUsers = () => connectedDb
+    .map(db => db.collection('users'))
+    .chain(collectionFind({}))
+
+var mongoProcess = (data) => Future.of()
+    .chain(emptyUsers)
+    .chain(insertUsers)
+    .chain(findUsers)
+    .chain(tapCloseDb)
 
 /********
  * Manager
@@ -104,15 +151,18 @@ app.get('/:name', function(req, res) {
         .map(R.objOf('name'))
         .map(JSON.stringify);
 
+    //message publish
     Future.of()
         .chain(() => createQueue('manager'))
         .chain(() => createQueue('worker'))
+        .chain(() => createQueue('worker2'))
+        .chain(() => createQueue('complete'))
         .map(() => safePayload.getOrElse())
         .chain(sendMessage('manager'))
         .fork(() => {}, () => {})
 
-
-    var collectMessage = popMessage('worker')
+    //message collect
+    var collectMessage = popMessage('complete')
         .map(R.prop('message'))
         .chain(val => val ? Future.of(val) : Future.reject())
         .map(JSON.parse)
@@ -136,6 +186,23 @@ var collectMessage = Future.of()
     .map(JSON.parse)
     .map(process)
     .map(JSON.stringify)
-    .chain(sendMessage('worker'))
+    .chain(sendMessage('worker2'))
 
 var looper = setInterval(() => collectMessage.fork(() => {}, () => {}), 100);
+
+
+/********
+ * worker2
+ *********/
+
+var collectMessage2 = Future.of()
+    .chain(() => popMessage('worker2'))
+    .map(R.prop('message'))
+    .chain(val => val ? Future.of(val) : Future.reject(val))
+    .map(R.tap(val => console.log('worker recieved', val)))
+    .map(JSON.parse)
+    .chain(mongoProcess)
+    .map(JSON.stringify)
+    .chain(sendMessage('complete'))
+
+var looper2 = setInterval(() => collectMessage2.fork(() => {}, () => {}), 100);
