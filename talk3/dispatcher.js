@@ -12,7 +12,6 @@ const workerfactory = memoize(queue => new RSMQWorker(queue, {
 const queueReady = memoize((queue) =>
     Future((reject, resolve) => workerfactory(queue).on('ready', resolve))
     .map(tap((val) => console.log('listening on queue : ', queue)))
-
 );
 
 const queueReadyCached = memoize((queue) => Future.cache(queueReady(queue)));

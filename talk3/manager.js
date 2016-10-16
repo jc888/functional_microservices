@@ -9,12 +9,9 @@ dispatcher('worker')({
     type: "blah"
 }).fork(() => {}, () => {})
 
-dispatcher('worker')({
-    type: "blah"
-}).fork(() => {}, () => {})
-
 const handle = pipe(
-	tap(val=>console.log('complete',val.id)),
+	tap(val=>console.log('complete',val.parsed)),
     Future.of
 )
+
 reciever('complete', handle);

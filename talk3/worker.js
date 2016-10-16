@@ -6,7 +6,7 @@ const { Future } = require('ramda-fantasy');
 
 var handle = pipe(
     Future.of,
-    map(tap(val => console.log('worker processing', val.msg))),
+    map(tap(val => console.log('worker processing', val.parsed))),
     map(always({
         'status': 'complete'
     })),
