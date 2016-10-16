@@ -1,29 +1,16 @@
+const reciever = require('./reciever');
+const dispatcher = require('./dispatcher');
 const R = require('ramda');
-const { map, compose, pipe, curry, tap, chain, always, juxt, mergeAll, identity, prop, objOf, assoc,converge } = require('ramda');
+const { when, equals, propSatisfies, map, compose, zip, fromPairs, pipe, nth, curry, tap, chain, unapply, always, juxt, mergeAll, identity, prop, objOf, assoc, converge, construct } = require('ramda');
 const { Future } = require('ramda-fantasy');
-const RSMQWorker = require("rsmq-worker");
 
-worker = new RSMQWorker("worker", {
-    interval: .1,
-    autostart: true
-});
-
-const strip = pipe(
-	prop('msg'),
-	JSON.parse
+var handle = pipe(
+    Future.of,
+    map(tap(val => console.log('worker processing', val.msg))),
+    map(always({
+        'status': 'complete'
+    })),
+    chain(dispatcher('complete'))
 )
 
-const process = pipe(
-    tap(val => val.next()),
-    juxt([identity,strip]),
-    mergeAll,
-    tap(console.log)
-)
-
-worker.on("message", function(msg, next, id) {
-    process({
-        msg: msg,
-        next: next,
-        id: id
-    })
-});
+reciever('worker', handle);
