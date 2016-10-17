@@ -10,8 +10,8 @@ class Broker extends EventEmitter {}
 const broker = new Broker();
 
 const handle = pipe(
-    tap(val => console.log('broker', val.json)),
-    tap(val => broker.emit(val.json.correlationId, val.json)),
+    tap(val => console.log('broker', val)),
+    tap(val => broker.emit(val.correlationId, val)),
     Future.of
 )
 

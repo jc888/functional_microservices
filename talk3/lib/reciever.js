@@ -10,16 +10,15 @@ const workerFactory = memoize(queue => new RSMQWorker(queue, {
     autostart: true
 }))
 
-const parse = pipe(
+const pipeThroughAsyncActionFn = asyncActionFn => pipe(
     prop('msg'),
     JSON.parse,
-    objOf('json')
+    asyncActionFn
 )
 
 const objectifyMessageCallback = pipe(
     zip(['msg', 'next', 'id']),
     fromPairs,
-    juxt([x => x, parse]),
     mergeAll
 )
 
@@ -27,7 +26,7 @@ const sourceAfterAfterAction = (val) => Future.of(() => val[0]).ap(val[1]);
 
 const createMessageHandler = asyncActionFn => pipe(
     unapply(objectifyMessageCallback),
-    juxt([x => x, asyncActionFn]),
+    juxt([x => x, pipeThroughAsyncActionFn(asyncActionFn)]),
     sourceAfterAfterAction,
     map(tap(val => val.next())),
     fut => fut.fork(() => {}, () => {})

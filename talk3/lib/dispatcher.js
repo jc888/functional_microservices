@@ -21,14 +21,13 @@ const queueSend = (queue, data) =>
 
 const send = curry(queueSend);
 
-const dispatcher = (queue, message) => {
-    return pipe(
-        () => queueReadyCached(queue),
-        map(() => message),
-        map(JSON.stringify),
-        map(tap((val) => console.log('dispatching on : ', queue))),
-        chain(send(queue))
-    )();
-}
+const dispatcher = (queue, message) => pipe(
+    () => queueReadyCached(queue),
+    map(() => message),
+    map(JSON.stringify),
+    map(tap((val) => console.log('dispatching on : ', queue))),
+    chain(send(queue)),
+    map(() => message)
+)();
 
 module.exports = curry(dispatcher);
