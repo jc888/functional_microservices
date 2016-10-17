@@ -1,5 +1,5 @@
 const R = require('ramda');
-const { memoize, map, compose, pipe, curry, tap, chain, always } = require('ramda');
+const { memoize, map, pipe, curry, tap, chain } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const RSMQWorker = require("rsmq-worker");
 
