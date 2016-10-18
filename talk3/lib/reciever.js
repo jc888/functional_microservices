@@ -1,7 +1,6 @@
 const R = require('ramda');
 const { memoize, map, zip, fromPairs, pipe, curry, tap, chain, unapply, juxt, mergeAll, prop, objOf, assoc } = require('ramda');
 const { Future } = require('ramda-fantasy');
-
 const RSMQWorker = require("rsmq-worker");
 
 const workerFactory = memoize(queue => new RSMQWorker(queue, {
