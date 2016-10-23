@@ -2,6 +2,8 @@ var Future = require('ramda-fantasy').Future;
 var Maybe = require('ramda-fantasy').Maybe;
 var IO = require('ramda-fantasy').IO;
 var R = require('ramda');
+var futurize = require('futurize').futurize;
+var inFuture = futurize(Future);
 
 var stateful = {
     users: [
@@ -76,13 +78,9 @@ var createQueueWithClient = (rsmq, queuename) =>
     Future((reject, resolve) =>
         rsmq.createQueue({ qname: queuename }, (err, resp) => resolve(resp)))
 
-var sendMessageWithClient = (rsmq, queuename, message) =>
-    Future((reject, resolve) =>
-        rsmq.sendMessage({ qname: queuename, message: message }, (err, resp) => err ? reject(err) : resolve(resp)))
+var sendMessageWithClient = (rsmq, queuename, message) => inFuture(rsmq.sendMessage)({ qname: queuename, message: message });
 
-var popMessageWithClient = (rsmq, queuename) =>
-    Future((reject, resolve) =>
-        rsmq.popMessage({ qname: queuename }, (err, resp) => err ? reject(err) : resolve(resp)))
+var popMessageWithClient = (rsmq, queuename) => inFuture(rsmq.popMessage)({ qname: queuename });
 
 var createQueue = R.curry(createQueueWithClient)(rsmq);
 var popMessage = R.curry(popMessageWithClient)(rsmq);
@@ -96,8 +94,7 @@ var MongoClient = require('mongodb').MongoClient
 
 var url = 'mongodb://localhost:27017/microservices';
 
-var connectDb = (url) => Future((reject, resolve) =>
-    MongoClient.connect(url, (err, db) => err ? reject(err) : resolve(db)))
+var connectDb = inFuture(MongoClient.connect)
 
 var collectionFind = R.curry((query, collection) =>
     Future((reject, resolve) => collection.find(query).toArray((err, docs) => err ? reject(err) : resolve(docs))))
@@ -152,6 +149,15 @@ app.get('/:name', function(req, res) {
         .map(JSON.stringify);
 
     //message publish
+
+    var mooey = R.compose(
+        R.chain(sendMessage('manager')),
+        R.map(() => safePayload.getOrElse()),
+        R.chain(()=>createQueue('manager'))
+    )
+    mooey(Future.of()).fork(() => {}, () => {});
+
+    /*
     Future.of()
         .chain(() => createQueue('manager'))
         .chain(() => createQueue('worker'))
@@ -160,7 +166,7 @@ app.get('/:name', function(req, res) {
         .map(() => safePayload.getOrElse())
         .chain(sendMessage('manager'))
         .fork(() => {}, () => {})
-
+   */
     //message collect
     var collectMessage = popMessage('complete')
         .map(R.prop('message'))

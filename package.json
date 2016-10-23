@@ -9,9 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "elasticsearch": "^11.0.1",
     "express": "^4.14.0",
+    "fluture": "^3.1.1",
+    "futurize": "^1.0.2",
     "highland": "^2.10.0",
     "mocha": "^3.0.2",
+    "mongo": "^0.1.0",
     "mongodb": "^2.2.10",
     "rabbit.js": "^0.4.4",
     "ramda-fantasy": "^0.7.0",
