@@ -1,4 +1,4 @@
-const { reduce, curry, merge, objOf, compose, map, chain, prop } = require('ramda');
+const { sequence, reduce, curry, merge, objOf, compose, map, chain, prop } = require('ramda');
 const { Future } = require('ramda-fantasy');
 
 var logger = curry((msg, v) => {
@@ -27,7 +27,7 @@ var findOne = curry((query, collection) => Future((reject, resolve) => collectio
 
 var search = query => Future((reject, resolve) => elasticsearchClient.search(query).then(resolve, reject));
 var parseSearch = compose(map(prop('_source')), prop('hits'), prop('hits'))
-var talksSearch = compose(map(parseSearch), search);
+var findTalks = compose(map(parseSearch), search);
 
 var find = curry((url, collectionName, query) => compose(
     chain(findOne(query)),
@@ -39,24 +39,22 @@ var findSpeaker = find(mongoConf, 'speakers');
 
 var queryFromTalk = compose(objOf('name'), prop('speaker'))
 
-var concatFoundSpeakers = curry((acc, fut, talk) => compose(
-    map(user => {
-        acc.push(user);
-        return acc;
-    }),
+var findSpeakerAndJoin = talk => compose(
     map(merge(talk)),
     map(logger('found speaker')),
-    chain(findSpeaker),
-    map(queryFromTalk),
-    map(() => talk)
-)(fut))
+    findSpeaker,
+    queryFromTalk
+)(talk);
 
-var findSpeakerForEachTalk = reduce(concatFoundSpeakers([]), Future.of({}))
+var findSpeakerForEachTalk = compose(
+    sequence(Future.of),
+    map(findSpeakerAndJoin)
+);
 
 var searchHandler = compose(
     chain(findSpeakerForEachTalk),
     map(logger('search results : ')),
-    talksSearch,
+    findTalks,
     logger('search term : ')
 )
 

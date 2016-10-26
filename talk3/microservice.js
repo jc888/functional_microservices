@@ -1,13 +1,15 @@
-var express = require('express');
-var app = express();
-var searchHandler = require('./searchHandler');
+const express = require('express');
+const app = express();
+const searchHandler = require('./searchHandler');
 
 app.get('/', function(req, res) {
     searchHandler(req.query)
         .fork(
-            err => res.status(502).send(err),
-            v => res.json(v)
-        );
+            err => res.status(err.status || 500).send(err.message),
+            r => res.send(r)
+        )
 });
+
+//app.listen(PORT || 8080, () => console.log(`Server listening on port ${PORT}`))
 
 module.exports = app;
