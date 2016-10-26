@@ -8,8 +8,8 @@ var handle = pipe(
     tap(val => console.log('worker recieved', val)),
     Future.of,
     chain(val => pipe(
-        () => mongofn.find(mongofn.url, 'users', {}),
-        map(objOf('users')),
+        () => mongofn.find(mongofn.url, 'speakers', {}),
+        map(objOf('speakers')),
         map(merge(val))
     )()),
     chain(dispatcher('broker'))

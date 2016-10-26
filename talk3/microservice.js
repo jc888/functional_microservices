@@ -1,8 +1,6 @@
-const { memoize, map, pipe, curry, tap, chain, has } = require('ramda');
 var express = require('express');
 var app = express();
 var searchHandler = require('./searchHandler');
-var seeder = require('./seeder2');
 
 app.get('/', function(req, res) {
     searchHandler(req.query)

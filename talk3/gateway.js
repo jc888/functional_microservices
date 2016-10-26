@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 const dispatcher = require('./lib/dispatcher');
 const seeder = require('./seeder');
+const worker = require('./worker');
 const broker = require('./broker');
 const uuid = require('uuid');
 
