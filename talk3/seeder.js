@@ -1,4 +1,4 @@
-const { memoize, equals, curry, merge, objOf, ifElse, compose, map, tap, chain, assocPath, prop, path, reduce } = require('ramda');
+const { addIndex, assoc, memoize, equals, curry, merge, objOf, ifElse, compose, map, tap, chain, assocPath, prop, path, reduce } = require('ramda');
 const { Future } = require('ramda-fantasy');
 
 
@@ -17,32 +17,17 @@ var demoSpeakers = [{
 }];
 
 var demoTalks = [{
-    index: 'function_microservices',
-    type: 'function_microservices',
-    id: '1',
-    body: {
-        title: "functional for the win",
-        description: "the basic building blocks of functional programming",
-        speaker: "andreas"
-    }
+    title: "functional for the win",
+    description: "the basic building blocks of functional programming",
+    speaker: "andreas"
 }, {
-    index: 'function_microservices',
-    type: 'function_microservices',
-    id: '2',
-    body: {
-        title: "Papas brand new functional bag",
-        description: "And why null can't hurt you",
-        speaker: "steffano"
-    }
+    title: "Papas brand new functional bag",
+    description: "And why null can't hurt you",
+    speaker: "steffano"
 }, {
-    index: 'function_microservices',
-    type: 'function_microservices',
-    id: '3',
-    body: {
-        title: "Microservices and how functional can help",
-        description: "I couldn't come up with a witty description",
-        speaker: "james"
-    }
+    title: "Microservices and how functional can help",
+    description: "I couldn't come up with a witty description",
+    speaker: "james"
 }]
 
 const mongodb = require('mongodb');
@@ -91,10 +76,18 @@ var upsert = query => {
     )()
 }
 
+var elasticSearchDocumentify = (index, type) => compose(
+    map(assoc('index', index)),
+    map(assoc('type', type)),
+    addIndex(map)((val, idx) => assoc('id', idx, val)),
+    map(objOf('body'))
+)
+
 module.exports = compose(
     map(tap(v => console.log('mongo seed complete'))),
     chain(() => insertSpeakers(demoSpeakers)),
     chain(() => removeSpeakers({})),
     map(tap(v => console.log('elasticsearch seed complete'))),
-    reduce((acc, entry) => acc.chain(() => upsert(entry)), Future.of())
+    reduce((acc, entry) => acc.chain(() => upsert(entry)), Future.of()),
+    elasticSearchDocumentify('function_microservices', 'function_microservices')
 )(demoTalks);
