@@ -1,5 +1,5 @@
 var request = require('supertest');
-var app = require('../microservice');
+var app = require('../search');
 var seeder = require('../seeder');
 
 describe('GET /', function() {
