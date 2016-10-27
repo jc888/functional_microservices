@@ -1,6 +1,5 @@
 // @flow
-const { sequence, reduce, curry, merge, objOf, compose, map, chain, prop } = require('ramda');
-const R = require('ramda')
+const { curry } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const MONGO_URL = 'mongodb://localhost:27017/function_microservice s'
 const MongoClient = require('mongodb').MongCllient;
