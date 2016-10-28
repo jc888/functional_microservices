@@ -4,10 +4,10 @@ const { MongoClient } = require('mongodb');
 
 const mongoConnect = conf => Future((reject, resolve) => MongoClient.connect(conf.url, (err, db) => err ? reject(err) : resolve(db)));
 const mongoCollection = curry((collectionName, db) => db.collection(collectionName));
-const findArray = curry((query, collection) => Future((reject, resolve) => collection.find(query).toArray((err, result) => err ? reject(err) : resolve(result))));
+const findOne = curry((query, collection) => Future((reject, resolve) => collection.findOne(query, {}, (err, result) => err ? reject(err) : resolve(result))));
 
 const find = curry((conf, collectionName, query) => compose(
-    chain(findArray(query)),
+    chain(findOne(query)),
     map(mongoCollection(collectionName)),
     mongoConnect
 )(conf));

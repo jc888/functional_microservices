@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const searchHandler = require('./searchHandler');
+const searchHandler = require('./searchHandler2');
 
 app.get('/', function(req, res) {
     searchHandler(req.query)
