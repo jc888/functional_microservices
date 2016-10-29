@@ -1,8 +1,10 @@
 const { sequence, juxt, chain, curry, map, compose } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const { MongoClient } = require('mongodb');
+const futureFromPromise = require('../futureFromPromise');
 
-const mongoConnect = conf => Future((reject, resolve) => MongoClient.connect(conf.url, (err, db) => err ? reject(err) : resolve(db)));
+const mongoConnect = conf => futureFromPromise(()=>MongoClient.connect(conf.url));
+
 const collectionFromDb = curry((collectionName, db) => db.collection(collectionName));
 const invokeAsyncOperationAgainstCollection = (collectionName, fn) => compose(fn, collectionFromDb(collectionName));
 

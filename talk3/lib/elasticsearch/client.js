@@ -1,6 +1,6 @@
 const elasticsearch = require('elasticsearch');
-const { clone } = require('ramda');
+const { clone, memoize } = require('ramda');
 
-const client = conf => () => new elasticsearch.Client(clone(conf));
+const client = memoize(conf => new elasticsearch.Client(clone(conf)));
 
 module.exports = client;
