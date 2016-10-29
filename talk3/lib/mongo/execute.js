@@ -7,7 +7,7 @@ const collectionFromDb = curry((collectionName, db) => db.collection(collectionN
 const invokeAsyncOperationAgainstCollection = (collectionName, fn) => compose(fn, collectionFromDb(collectionName));
 
 const closeAfterResult = ([result, db]) => {
-    db.close()
+    db.close();
     return result;
 };
 

@@ -1,5 +1,6 @@
-const { addIndex, assoc, memoize, equals, curry, merge, objOf, ifElse, compose, map, tap, chain, assocPath, prop, path, reduce } = require('ramda');
+const { addIndex, sequence, assoc, compose, map, tap, chain, objOf } = require('ramda');
 const { Future } = require('ramda-fantasy');
+const logger = require('./lib/logger');
 
 var demoSpeakers = [{
     name: "james",
@@ -29,51 +30,9 @@ var demoTalks = [{
     speaker: "james"
 }]
 
-const mongodb = require('mongodb');
-const MongoClient = mongodb.MongoClient;
-const url = 'mongodb://localhost:27017/function_microservices';
+const mongoSpeakers = require('./mongoSpeakers');
 
-var connect = url => Future((reject, resolve) => MongoClient.connect(url, (err, db) => err ? reject(err) : resolve(db)))
-var collectionFromDb = curry((collectionName, db) => db.collection(collectionName));
-var mongoCollection = (url, collectionName) => compose(map(collectionFromDb(collectionName)), connect)(url);
-var removeCollection = curry((query, collection) => Future((reject, resolve) => collection.remove(query, (err, result) => err ? reject(err) : resolve(result))));
-var insertCollection = curry((values, collection) => Future((reject, resolve) => collection.insert(values, {}, (err, result) => err ? reject(err) : resolve(result))));
-
-var remove = curry((url, collectionName, query) => compose(
-    chain(removeCollection(query)),
-    () => mongoCollection(url, collectionName)
-)())
-
-var insert = curry((url, collectionName, values) => compose(
-    chain(insertCollection(values)),
-    () => mongoCollection(url, collectionName)
-)())
-
-var removeSpeakers = remove(url, 'speakers');
-var insertSpeakers = insert(url, 'speakers');
-
-var elasticsearch = require('elasticsearch');
-var elasticsearchClient = new elasticsearch.Client({
-    host: 'localhost:9200',
-    log: 'error'
-});
-
-var createES = query => Future((reject, resolve) => elasticsearchClient.create(query).then(resolve, reject));
-var deleteES = query => Future((reject, resolve) => elasticsearchClient.delete(query).then(resolve, reject));
-var existsES = query => Future((reject, resolve) => elasticsearchClient.exists(query).then(resolve, reject));
-
-var upsert = query => {
-    var exists = () => existsES(query);
-    var create = () => createES(query);
-    var remove = () => deleteES(query);
-    var removeIfExists = ifElse(equals(true), remove, Future.of);
-
-    return compose(
-        chain(create),
-        chain(removeIfExists),
-        exists
-    )()
-}
+var elasticsearch = require('./elasticsearch');
 
 var elasticSearchDocumentify = (index, type) => compose(
     map(assoc('index', index)),
@@ -84,9 +43,10 @@ var elasticSearchDocumentify = (index, type) => compose(
 
 module.exports = compose(
     map(tap(v => console.log('mongo seed complete'))),
-    chain(() => insertSpeakers(demoSpeakers)),
-    chain(() => removeSpeakers({})),
+    chain(() => mongoSpeakers.insert(demoSpeakers)),
+    chain(() => mongoSpeakers.remove({})),
     map(tap(v => console.log('elasticsearch seed complete'))),
-    reduce((acc, entry) => acc.chain(() => upsert(entry)), Future.of()),
+    sequence(Future.of),
+    map(elasticsearch.upsert),
     elasticSearchDocumentify('function_microservices', 'function_microservices')
 )(demoTalks);

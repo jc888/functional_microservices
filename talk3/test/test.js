@@ -7,7 +7,7 @@ describe('GET /', function() {
     it('respond with json', function(done) {
         request(app)
             .get('/')
-            .query({ q: 'functional' })
+            .query({ q: 'microservices' })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .end((err, res) => {
