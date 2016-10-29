@@ -1,7 +1,6 @@
 const { addIndex, assoc, memoize, equals, curry, merge, objOf, ifElse, compose, map, tap, chain, assocPath, prop, path, reduce } = require('ramda');
 const { Future } = require('ramda-fantasy');
 
-
 var demoSpeakers = [{
     name: "james",
     surname: "chow",

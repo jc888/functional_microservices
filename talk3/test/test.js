@@ -6,7 +6,8 @@ describe('GET /', function() {
     before(done => seeder.fork(done, () => done()));
     it('respond with json', function(done) {
         request(app)
-            .get('/jack')
+            .get('/')
+            .query({ q: 'functional' })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .end((err, res) => {

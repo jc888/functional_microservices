@@ -1,31 +1,29 @@
-const { sequence, groupBy, evolve, reduce, curry, merge, objOf, compose, map, chain, prop } = require('ramda');
+// @flow
+const { groupBy, juxt, sequence, curry, compose, map, chain, prop, merge, pluck, head } = require('ramda');
 const { Future } = require('ramda-fantasy');
-const mongoFind = require('./lib/mongoFind');
-const elasticSearchFind = require('./lib/elasticSearchFind');
-const config = require('config');
+const logger = require('./lib/logger');
+const mongoFind = require('./mongoFind');
+const elasticsearch = require('./elasticsearch');
 
-const logger = curry((msg, v) => {
-    console.log(msg, v);
-    return v;
-});
+const joinSpeakersWithSearchResult = ([results, speakers]) => {
+    const speakerMap = groupBy(prop('name'), speakers);
+    return map(r => merge(r, { speaker: head(speakerMap[r.speaker]) }), results)
+}
 
-const queryElasticSearch = elasticSearchFind(config.elasticsearch);
-const parseElasticSearchResults = compose(map(prop('_source')), prop('hits'), prop('hits'));
-const findTalks = compose(map(parseElasticSearchResults), queryElasticSearch);
+const findSpeakers = compose(
+    speakers => mongoFind({ name: { $in: speakers } }),
+    pluck('speaker')
+);
 
-const findSpeaker = mongoFind(config.mongo, 'speakers');
-const queryFromTalk = compose(objOf('name'), prop('speaker'));
-const findSpeakerForTalk = compose(findSpeaker, queryFromTalk);
-const findSpeakerAndJoin = talk => compose(map(merge(talk)), findSpeakerForTalk)(talk);
-const findSpeakersForTalks = compose(sequence(Future.of), map(findSpeakerAndJoin));
-const groupByJob = groupBy(prop('title'));
+const findSpeakersWithResult = compose(sequence(Future.of), juxt([Future.of, findSpeakers]))
 
-const searchHandler = compose(
-    map(groupByJob),
-    chain(findSpeakersForTalks),
-    map(logger('search results : ')),
-    findTalks,
-    logger('search term : ')
+const parseSearch = compose(map(prop('_source')), prop('hits'), prop('hits'))
+const findTalks = compose(map(parseSearch), elasticsearch);
+
+const handler = compose(
+    map(joinSpeakersWithSearchResult),
+    chain(findSpeakersWithResult),
+    findTalks
 )
 
-module.exports = searchHandler;
+module.exports = handler;

@@ -1,5 +1,4 @@
-const R = require('ramda');
-const { memoize, map, zip, fromPairs, pipe, curry, tap, chain, unapply, juxt, mergeAll, prop, objOf, assoc } = require('ramda');
+const { memoize, map, zip, fromPairs, pipe, tap, unapply, juxt, mergeAll, prop } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const RSMQWorker = require("rsmq-worker");
 
@@ -21,12 +20,12 @@ const objectifyMessageCallback = pipe(
     mergeAll
 )
 
-const sourceAfterAfterAction = (val) => Future.of(() => val[0]).ap(val[1]);
+const sourceAfterAction = (val) => Future.of(() => val[0]).ap(val[1]);
 
 const createMessageHandler = asyncActionFn => pipe(
     unapply(objectifyMessageCallback),
     juxt([x => x, pipeThroughAsyncActionFn(asyncActionFn)]),
-    sourceAfterAfterAction,
+    sourceAfterAction,
     map(tap(val => val.next())),
     fut => fut.fork(() => {}, () => {})
 );

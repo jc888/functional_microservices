@@ -1,4 +1,4 @@
-const reciever = require('./lib/reciever');
+const reciever = require('./lib/messaging/reciever');
 const EventEmitter = require('events');
 const { map, compose, pipe, curry, tap, chain, always } = require('ramda');
 const { Future } = require('ramda-fantasy');
@@ -10,7 +10,7 @@ const broker = new Broker();
 const handle = pipe(
     Future.of,
     map(tap(val => console.log('broker', val))),
-    map(tap(val => broker.emit(val.correlationId, val)))
+    map(tap(val => broker.emit(val.correlationId, val.payload)))
 )
 
 reciever('broker', handle);
