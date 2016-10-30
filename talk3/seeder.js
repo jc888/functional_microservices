@@ -41,7 +41,10 @@ var elasticSearchDocumentify = (index, type) => compose(
     map(objOf('body'))
 )
 
+var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v), time));
+
 module.exports = compose(
+    chain(delay(200)),
     map(tap(v => console.log('mongo seed complete'))),
     chain(() => mongoSpeakers.insert(demoSpeakers)),
     chain(() => mongoSpeakers.remove({})),

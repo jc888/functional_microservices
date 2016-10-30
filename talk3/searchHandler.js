@@ -1,5 +1,5 @@
 // @flow
-const { groupBy, juxt, sequence, compose, map, chain, prop, merge, pluck, head } = require('ramda');
+const { groupBy, ap, of, sequence, compose, map, chain, prop, merge, pluck, head } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const logger = require('./lib/logger');
 const mongoSpeakers = require('./mongoSpeakers');
@@ -15,10 +15,19 @@ const findSpeakers = compose(
     pluck('speaker')
 );
 
-const findSpeakersWithResult = compose(sequence(Future.of), juxt([Future.of, findSpeakers]))
+const findSpeakersWithResult = compose(
+    sequence(Future.of),
+    ap([Future.of, findSpeakers]),
+    of
+)
 
-const parseSearch = compose(map(prop('_source')), prop('hits'), prop('hits'))
-const findTalks = compose(map(parseSearch), elasticsearch.search);
+const parseResults = compose(
+    map(prop('_source')),
+    prop('hits'),
+    prop('hits')
+)
+
+const findTalks = compose(map(parseResults), elasticsearch.search);
 
 const handler = compose(
     map(joinSpeakersWithSearchResult),

@@ -1,12 +1,13 @@
-const { sequence, juxt, chain, curry, map, compose } = require('ramda');
+const { ap, of, sequence, chain, curry, map, compose } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const { MongoClient } = require('mongodb');
 const futureFromPromise = require('../futureFromPromise');
-
-const mongoConnect = conf => futureFromPromise(()=>MongoClient.connect(conf.url));
+const logger = require('../logger');
+const mongoConnect = conf => futureFromPromise(() => MongoClient.connect(conf.url));
 
 const collectionFromDb = curry((collectionName, db) => db.collection(collectionName));
-const invokeAsyncOperationAgainstCollection = (collectionName, fn) => compose(fn, collectionFromDb(collectionName));
+
+const invokeAsyncOperationAgainstCollection = (collectionName, asyncOperation) => compose(asyncOperation, collectionFromDb(collectionName));
 
 const closeAfterResult = ([result, db]) => {
     db.close();
@@ -16,7 +17,8 @@ const closeAfterResult = ([result, db]) => {
 const execute = curry((conf, collectionName, asyncOperation) => compose(
     map(closeAfterResult),
     chain(sequence(Future.of)),
-    map(juxt([invokeAsyncOperationAgainstCollection(collectionName, asyncOperation), Future.of])),
+    map(ap([invokeAsyncOperationAgainstCollection(collectionName, asyncOperation), Future.of])),
+    map(of),
     mongoConnect
 )(conf));
 
