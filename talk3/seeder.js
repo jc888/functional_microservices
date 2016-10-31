@@ -30,7 +30,7 @@ var demoTalks = [{
     speaker: "james"
 }]
 
-const mongoSpeakers = require('./mongoSpeakers');
+const mongo = require('./mongo');
 
 var elasticsearch = require('./elasticsearch');
 
@@ -46,8 +46,8 @@ var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v)
 module.exports = compose(
     chain(delay(200)),
     map(tap(v => console.log('mongo seed complete'))),
-    chain(() => mongoSpeakers.insert(demoSpeakers)),
-    chain(() => mongoSpeakers.remove({})),
+    chain(() => mongo.insert('speakers',demoSpeakers)),
+    chain(() => mongo.remove('speakers',{})),
     map(tap(v => console.log('elasticsearch seed complete'))),
     sequence(Future.of),
     map(elasticsearch.upsert),
