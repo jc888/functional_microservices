@@ -23,6 +23,7 @@
     "rabbit.js": "^0.4.4",
     "ramda": "^0.22.1",
     "ramda-fantasy": "^0.7.0",
+    "request-json": "^0.6.1",
     "rsmq": "^0.7.1"
   },
   "devDependencies": {

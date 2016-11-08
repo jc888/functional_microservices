@@ -31,6 +31,7 @@ const findTalks = compose(map(parseResults), elasticsearch.search);
 const handler = compose(
     map(joinSpeakersWithSearchResult),
     chain(findSpeakersWithResult),
+    map(logger('response')),
     findTalks
 );
 

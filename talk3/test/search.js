@@ -1,8 +1,9 @@
 var request = require('supertest');
 var app = require('../search');
-var seeder = require('../seeder');
+var seeder = require('../harvest');
 
 describe('GET /', function() {
+    this.timeout(20000);
     before(done => seeder.fork(done, () => done()));
     it('respond with json', function(done) {
         request(app)
