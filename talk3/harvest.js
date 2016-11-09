@@ -11,7 +11,6 @@ var requestFn = curry((url, endpoint) => compose(
     map(prop('body')),
     futureFromPromise,
     client => () => client.get(endpoint),
-    //tap(cl => cl.setBasicAuth('jc888', 'tranqulity5')),
     request.createClient
 )(url))
 
@@ -30,7 +29,7 @@ var mapOverSpeakers = curry((event, acc, speaker) => {
 
 var mapOverEvents = (acc, event) => reduce(mapOverSpeakers(event), acc, event.speakers);
 
-var extractSpeakers = reduce(mapOverEvents, []);
+var talksFromEvents = reduce(mapOverEvents, []);
 
 var fetchFromGithub = compose(
     requestFn('https://api.github.com/'),
@@ -61,20 +60,24 @@ var filterForGithub = filter(
 
 var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v), time));
 
-var uploadAllTalks = compose(
-    //sequence(Future.of),
-    //map(upsertAndReturn),
-    //Future.of,
-    //elasticSearchDocumentify('lnug_speakers', 'lnug_speakers'),
-    logger('speakers'),
+var storeTalks = compose(
+    sequence(Future.of),
+    map(upsertAndReturn),
+    elasticSearchDocumentify('lnug_speakers', 'lnug_speakers'),
+    talksFromEvents
+)
+
+var storeSpeakers = compose(
     getGithubInfo,
     filterForGithub,
-    extractSpeakers
+    pluck('body')
 )
 
 module.exports = compose(
     chain(delay(200)),
+    map(tap(v => console.log('mongo seed complete'))),
+    chain(storeSpeakers),
     map(tap(v => console.log('elasticsearch seed complete'))),
-    chain(uploadAllTalks),
+    chain(storeTalks),
     () => requestFn('https://raw.githubusercontent.com/', 'lnug/website/master/data/archive.json')
 )();
