@@ -1,16 +1,19 @@
-const { addIndex, pluck, curry, filter, propSatisfies, test, reduce, sequence, assoc, compose, map, tap, chain, objOf, prop } = require('ramda');
+const { addIndex, match, pluck, curry, filter, test, reduce, sequence, assoc, compose, map, tap, chain, objOf, prop } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const logger = require('./lib/logger');
 const request = require('request-json');
 const futureFromPromise = require('./lib/futureFromPromise');
 
 var elasticsearch = require('./elasticsearch');
+var mongo = require('./mongo');
 
-var requestFn = (url, endpoint) => compose(
+var requestFn = curry((url, endpoint) => compose(
+    map(prop('body')),
     futureFromPromise,
     client => () => client.get(endpoint),
+    //tap(cl => cl.setBasicAuth('jc888', 'tranqulity5')),
     request.createClient
-)(url)
+)(url))
 
 var elasticSearchDocumentify = (index, type) => compose(
     map(assoc('index', index)),
@@ -29,13 +32,31 @@ var mapOverEvents = (acc, event) => reduce(mapOverSpeakers(event), acc, event.sp
 
 var extractSpeakers = reduce(mapOverEvents, []);
 
+var fetchFromGithub = compose(
+    requestFn('https://api.github.com/'),
+    logger('user'),
+    x => 'users/' + x[1],
+    match(/(?:https\:\/\/github.com\/)(.*)/),
+    prop('url')
+)
+
+var getGithubInfo = compose(
+    chain(mongo.insert('speakers')),
+    map(logger('inserted users')),
+    sequence(Future.of),
+    map(fetchFromGithub)
+)
+
 var upsertAndReturn = val => compose(
     map(() => val),
     elasticsearch.upsert
 )(val);
 
 var filterForGithub = filter(
-    propSatisfies(test(/github/), 'url')
+    compose(
+        test(/github/),
+        prop('url')
+    )
 )
 
 var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v), time));
@@ -43,12 +64,12 @@ var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v)
 var uploadAllTalks = compose(
     //sequence(Future.of),
     //map(upsertAndReturn),
-    Future.of,
-    elasticSearchDocumentify('lnug_speakers', 'lnug_speakers'),
+    //Future.of,
+    //elasticSearchDocumentify('lnug_speakers', 'lnug_speakers'),
     logger('speakers'),
+    getGithubInfo,
     filterForGithub,
-    extractSpeakers,
-    prop('body')
+    extractSpeakers
 )
 
 module.exports = compose(
