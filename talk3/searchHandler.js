@@ -18,11 +18,9 @@ const findSpeakersForTalks = compose(
     pluck('speaker')
 );
 
-const findSpeakersWithResult = compose(
-    sequence(Future.of),
-    ap([Future.of, findSpeakersForTalks]),
-    talks => [talks]
-);
+const findSpeakersWithResult = talks =>
+   sequence(Future.of, [Future.of(talks), findSpeakersForTalks(talks)])
+
 
 const parseResults = compose(pluck('_source'), prop('hits'), prop('hits'));
 
