@@ -1,6 +1,6 @@
 var request = require('supertest');
 var app = require('../search');
-var seeder = require('../harvest');
+var seeder = require('../seeder');
 
 describe('GET /', function() {
     this.timeout(20000);
