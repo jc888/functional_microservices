@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -w talk3/test/search.js",
-    "microservices": "mocha -w talk3/test/test.js"
+    "test": "mocha -w test/search.js",
+    "microservices": "mocha -w test/test.js",
+    "start":"node search.js"
   },
   "author": "",
   "license": "ISC",
