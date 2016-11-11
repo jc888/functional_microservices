@@ -4,7 +4,7 @@ const { Future } = require('ramda-fantasy');
 const logger = require('./lib/logger');
 const mongo = require('./mongo');
 const elasticsearch = require('./elasticsearch');
-const futureAll = require('./lib/futureAll');
+const parallel = require('parallel-future')(Future);
 
 // joinSpeakersWithTalks :: [a] -> [b]
 const joinSpeakersWithTalks = ([results, speakers]) => {
@@ -29,7 +29,7 @@ const findSpeakersFromTalks = compose(
 
 // findSpeakersWithTalks :: [a] -> Future e b
 const findSpeakersWithTalks = compose(
-    futureAll,
+    parallel,
     talks => [Future.of(talks), findSpeakersFromTalks(talks)]
 );
 

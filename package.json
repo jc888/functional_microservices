@@ -7,7 +7,7 @@
     "seed": "node seed.js",
     "test": "mocha -w test/search.js",
     "microservices": "mocha -w test/test.js",
-    "start":"node app.js"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "highland": "^2.10.0",
     "mongo": "^0.1.0",
     "mongodb": "^2.2.10",
+    "parallel-future": "0.0.6",
     "ramda": "^0.22.1",
     "ramda-fantasy": "^0.7.0",
     "request-json": "^0.6.1",
