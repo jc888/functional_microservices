@@ -1,5 +1,5 @@
-const { addIndex, sequence, assoc, compose, map, tap, chain } = require('ramda');
-const { Future } = require('ramda-fantasy');
+const { addIndex, assoc, compose, map, tap, chain } = require('ramda');
+const Future = require('Fluture');
 const logger = require('../lib/logger');
 
 var mongo = require('../mongo');
@@ -19,7 +19,7 @@ var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v)
 // seedElasticSearch :: () -> Future e a
 var seedElasticSearch = compose(
     map(tap(v => console.log('elasticsearch seed complete'))),
-    sequence(Future.of),
+    Future.parallel(1),
     map(elasticsearch.upsert),
     elasticSearchDocumentify('function_microservices', 'function_microservices'),
     () => require('./data/talks.json')
