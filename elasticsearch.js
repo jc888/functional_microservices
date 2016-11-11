@@ -1,5 +1,5 @@
 var conf = {
-    host: 'localhost:9200',
+    host: 'elasticsearch:9200',
     log: 'error'
 };
 

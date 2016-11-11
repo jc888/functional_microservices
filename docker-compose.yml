@@ -25,5 +25,11 @@ services:
     container_name: app
     command: tail -f /dev/null
     working_dir: /home/root
+    links:
+      - mongo
+      - elasticsearch
+      - redis
     volumes:
       - ./:/home/root
+    ports:
+      - "8080:8080"

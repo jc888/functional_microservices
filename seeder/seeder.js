@@ -1,6 +1,6 @@
 const { addIndex, sequence, assoc, compose, map, tap, chain, objOf } = require('ramda');
 const { Future } = require('ramda-fantasy');
-const logger = require('./lib/logger');
+const logger = require('../lib/logger');
 
 var demoSpeakers = [{
     name: "james",
@@ -30,9 +30,9 @@ var demoTalks = [{
     speaker: "james"
 }]
 
-const mongo = require('./mongo');
+const mongo = require('../mongo');
 
-var elasticsearch = require('./elasticsearch');
+var elasticsearch = require('../elasticsearch');
 
 var elasticSearchDocumentify = (index, type) => compose(
     map(assoc('index', index)),
