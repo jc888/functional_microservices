@@ -2,34 +2,6 @@ const { addIndex, sequence, assoc, compose, map, tap, chain, objOf } = require('
 const { Future } = require('ramda-fantasy');
 const logger = require('../lib/logger');
 
-var demoSpeakers = [{
-    name: "james",
-    surname: "chow",
-    title: "devops"
-}, {
-    name: "steffano",
-    surname: "vozza",
-    title: "developer"
-}, {
-    name: "andreas",
-    surname: "moller",
-    title: "developer"
-}];
-
-var demoTalks = [{
-    title: "functional for the win",
-    description: "the basic building blocks of functional programming",
-    speaker: "andreas"
-}, {
-    title: "Papas brand new functional bag",
-    description: "And why null can't hurt you",
-    speaker: "steffano"
-}, {
-    title: "Microservices and how functional can help",
-    description: "I couldn't come up with a witty description",
-    speaker: "james"
-}]
-
 const mongo = require('../mongo');
 
 var elasticsearch = require('../elasticsearch');
@@ -46,10 +18,10 @@ var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v)
 module.exports = compose(
     chain(delay(200)),
     map(tap(v => console.log('mongo seed complete'))),
-    chain(() => mongo.insert('speakers',demoSpeakers)),
+    chain(() => mongo.insert('speakers',require('./data/speakers.json'))),
     chain(() => mongo.remove('speakers',{})),
     map(tap(v => console.log('elasticsearch seed complete'))),
     sequence(Future.of),
     map(elasticsearch.upsert),
     elasticSearchDocumentify('function_microservices', 'function_microservices')
-)(demoTalks);
+)(require('./data/talks.json'));
