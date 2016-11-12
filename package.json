@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "seed": "node seed.js",
-    "test": "mocha -w test/search.js",
+    "test": "mocha -w test/app.js",
     "microservices": "mocha -w test/test.js",
-    "start": "node app.js"
+    "start": "node start.js"
   },
   "author": "",
   "license": "ISC",
