@@ -1,10 +1,9 @@
 // @flow
 const { groupBy, compose, map, chain, prop, path, merge, pluck, head } = require('ramda');
-const { Future } = require('ramda-fantasy');
-const logger = require('./lib/logger');
-const mongo = require('./mongo');
-const elasticsearch = require('./elasticsearch');
-const parallel = require('parallel-future')(Future);
+const Future = require('fluture');
+const logger = require('../lib/logger');
+const mongo = require('../mongo');
+const elasticsearch = require('../elasticsearch');
 
 // joinSpeakersWithTalks :: [a] -> [b]
 const joinSpeakersWithTalks = ([results, speakers]) => {
@@ -27,23 +26,25 @@ const findSpeakersFromTalks = compose(
     speakerQueryFromTalks
 );
 
-// findSpeakersWithTalks :: [a] -> Future e b
-const findSpeakersWithTalks = compose(
-    parallel,
-    talks => [Future.of(talks), findSpeakersFromTalks(talks)]
-);
-
 // parseResults :: {hits:{hits:[{_source:v}]}} -> [talks]
 const parseResults = compose(pluck('_source'), path(['hits', 'hits']));
 
 // findTalks :: {q:a} -> Future e talks
 const findTalks = compose(map(parseResults), elasticsearch.search);
 
-// handler :: {q:a} -> Future e b
-const handler = compose(
+// search :: {q:a} -> Future e b
+const search = compose(
     map(joinSpeakersWithTalks),
-    chain(findSpeakersWithTalks),
+    chain(talks => Future.parallel(5, [Future.of(talks), findSpeakersFromTalks(talks)])),
     findTalks
 );
 
-module.exports = handler;
+module.exports = {
+    joinSpeakersWithTalks,
+    findSpeakers,
+    speakerQueryFromTalks,
+    findSpeakersFromTalks,
+    parseResults,
+    findTalks,
+    search
+}
