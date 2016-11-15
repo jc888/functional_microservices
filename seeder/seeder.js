@@ -1,5 +1,5 @@
 const { addIndex, assoc, compose, map, tap, chain } = require('ramda');
-const Future = require('Fluture');
+const Future = require('fluture');
 const logger = require('../lib/logger');
 
 var mongo = require('../mongo');
