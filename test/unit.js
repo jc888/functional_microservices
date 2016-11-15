@@ -1,28 +1,8 @@
 const { map } = require('ramda');
 const { Future } = require('ramda-fantasy');
 const rewire = require('rewire');
-const mod = rewire('../searchHandler');
+const mod = rewire('../handlers/search');
 const sinon = require('sinon');
-
-var fakeData = [{
-    name: 'james',
-    surname: 'chow',
-    title: 'devops'
-}, {
-    name: 'steffano',
-    surname: 'vozza',
-    title: 'developer'
-}, {
-    name: 'andreas',
-    surname: 'moller',
-    title: 'developer'
-}];
-
-var fakeElasticSearch = {
-    hits: {
-        hits: []
-    }
-};
 
 
 describe('GET /', function() {
