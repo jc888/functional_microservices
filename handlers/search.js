@@ -7,8 +7,8 @@ const elasticsearch = require('../elasticsearch');
 
 // joinSpeakersWithTalks :: [[Talk],[Speaker]] -> [TalkWithSpeaker]
 const joinSpeakersWithTalks = ([talks, speakers]) => {
-    const speakerMap = groupBy(prop('name'), speakers);
-    return map(r => merge(r, { speaker: head(speakerMap[r.speaker]) }), talks)
+    const speakerMap = groupBy(prop('handle'), speakers);
+    return map(r => merge(r, { speaker: head(speakerMap[r.handle]) }), talks)
 };
 
 // findSpeakers :: SpeakerQuery -> Future e [Speaker]
@@ -16,8 +16,8 @@ const findSpeakers = mongo.find('speakers');
 
 // speakerQueryFromTalks :: [Talk] -> SpeakerQuery
 const speakerQueryFromTalks = compose(
-    speakerNames => ({ name: { $in: speakerNames } }),
-    pluck('speaker')
+    handles => ({ handle: { $in: handles } }),
+    pluck('handle')
 );
 
 // findSpeakersForTalks :: [Talk] -> Future e [Speaker]

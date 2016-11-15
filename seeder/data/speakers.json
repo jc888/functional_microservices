@@ -1,13 +1,263 @@
-[{
-    "name": "james",
-    "surname": "chow",
-    "title": "devops"
-}, {
-    "name": "steffano",
-    "surname": "vozza",
-    "title": "developer"
-}, {
-    "name": "andreas",
-    "surname": "moller",
-    "title": "developer"
-}]
+[
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/svozza",
+    "speakerUrl": "https://github.com/svozza",
+    "img": "https://avatars.githubusercontent.com/u/8573472?v=3",
+    "handle": "svozza",
+    "name": "Stefano",
+    "surname":"Vozza",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/jc888",
+    "speakerUrl": "https://github.com/jc888",
+    "img": "https://avatars.githubusercontent.com/u/3694261?v=3",
+    "handle": "jc888",
+    "name": "James",
+    "surname":"Chow",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/cullophid",
+    "speakerUrl": "https://github.com/cullophid",
+    "img": "https://avatars.githubusercontent.com/u/1183585?v=3",
+    "handle": "cullophid",
+    "name": "Andreas",
+    "surname":"Møller",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/bookercodes",
+    "speakerUrl": "https://github.com/bookercodes",
+    "img": "https://avatars.githubusercontent.com/u/11927968?v=3",
+    "handle": "bookercodes",
+    "name": "Booker",
+    "surname":"codes",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/lazlojuly",
+    "speakerUrl": "https://github.com/lazlojuly",
+    "img": "https://avatars.githubusercontent.com/u/7015868?v=3",
+    "handle": "lazlojuly",
+    "name": "lazlo",
+    "surname":"july",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/mikemaccana",
+    "speakerUrl": "https://github.com/mikemaccana",
+    "img": "https://avatars.githubusercontent.com/u/172594?v=3",
+    "handle": "mikemaccana",
+    "name": "Mike",
+    "surname":"MacCana",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/foxreymann",
+    "speakerUrl": "https://github.com/foxreymann",
+    "img": "https://avatars.githubusercontent.com/u/807661?v=3",
+    "handle": "foxreymann",
+    "name": "Fox",
+    "surname":"Reymann",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/gnugat",
+    "speakerUrl": "https://github.com/gnugat",
+    "img": "https://avatars.githubusercontent.com/u/793185?v=3",
+    "handle": "gnugat",
+    "name": "Loïc",
+    "surname":"Faugeron",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/tanzim",
+    "speakerUrl": "https://github.com/tanzim",
+    "img": "https://avatars.githubusercontent.com/u/1591642?v=3",
+    "handle": "tanzim",
+    "name": "Tanzim",
+    "surname":"",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/dmagliola",
+    "speakerUrl": "https://github.com/dmagliola",
+    "img": "https://avatars.githubusercontent.com/u/1516867?v=3",
+    "handle": "dmagliola",
+    "name": "Daniel",
+    "surname":"Magliola",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/bernardbaker",
+    "speakerUrl": "https://github.com/bernardbaker",
+    "img": "https://avatars.githubusercontent.com/u/13556172?v=3",
+    "handle": "bernardbaker",
+    "name": "Bernard",
+    "surname":"Baker",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/guypod",
+    "speakerUrl": "https://github.com/guypod",
+    "img": "https://avatars.githubusercontent.com/u/1106394?v=3",
+    "handle": "guypod",
+    "name": "Guy",
+    "surname":"Podjarny",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/shakyShane",
+    "speakerUrl": "https://github.com/shakyShane",
+    "img": "https://avatars.githubusercontent.com/u/1643522?v=3",
+    "handle": "shakyShane",
+    "name": "Shane",
+    "surname":"Osbourne",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/zsid",
+    "speakerUrl": "https://github.com/zsid",
+    "img": "https://avatars.githubusercontent.com/u/11786608?v=3",
+    "handle": "zsid",
+    "name": "Zhivko",
+    "surname":"Siderov",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/hxoliverrumbelow",
+    "speakerUrl": "https://github.com/hxoliverrumbelow",
+    "img": "https://avatars.githubusercontent.com/u/3088374?v=3",
+    "handle": "hxoliverrumbelow",
+    "name": "Oliver",
+    "surname":"Rumbelow",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/HugoDF",
+    "speakerUrl": "https://github.com/HugoDF",
+    "img": "https://avatars.githubusercontent.com/u/6459679?v=3",
+    "handle": "HugoDF",
+    "name": "Hugo",
+    "surname":"",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/philnash",
+    "speakerUrl": "https://github.com/philnash",
+    "img": "https://avatars.githubusercontent.com/u/31462?v=3",
+    "handle": "philnash",
+    "name": "Phil",
+    "surname":"Nash",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/BenHall",
+    "speakerUrl": "https://github.com/BenHall",
+    "img": "https://avatars.githubusercontent.com/u/82614?v=3",
+    "handle": "BenHall",
+    "name": "Ben",
+    "surname":"Hall",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/fabiosantoscode",
+    "speakerUrl": "https://github.com/fabiosantoscode",
+    "img": "https://avatars.githubusercontent.com/u/1611595?v=3",
+    "handle": "fabiosantoscode",
+    "name": "Fábio",
+    "surname":"Santos",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/forbesmyester",
+    "speakerUrl": "https://github.com/forbesmyester",
+    "img": "https://avatars.githubusercontent.com/u/3470771?v=3",
+    "handle": "forbesmyester",
+    "name": "Matt",
+    "surname":"Forrester",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/bananaoomarang",
+    "speakerUrl": "https://github.com/bananaoomarang",
+    "img": "https://avatars.githubusercontent.com/u/815831?v=3",
+    "handle": "bananaoomarang",
+    "name": "Milo",
+    "surname":"Mordaunt",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/alistairstead",
+    "speakerUrl": "https://github.com/alistairstead",
+    "img": "https://avatars.githubusercontent.com/u/62936?v=3",
+    "handle": "alistairstead",
+    "name": "Alistair",
+    "surname":"Stead",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/tomgco",
+    "speakerUrl": "https://github.com/tomgco",
+    "img": "https://avatars.githubusercontent.com/u/524382?v=3",
+    "handle": "tomgco",
+    "name": "Tom",
+    "surname":"Gallacher",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/bodil",
+    "speakerUrl": "https://github.com/bodil",
+    "img": "https://avatars.githubusercontent.com/u/17880?v=3",
+    "handle": "bodil",
+    "name": "Bodil",
+    "surname":"Stokke",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/hassy",
+    "speakerUrl": "https://github.com/hassy",
+    "img": "https://avatars.githubusercontent.com/u/1490?v=3",
+    "handle": "hassy",
+    "name": "hassy",
+    "surname":"veldstra",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/burtonjc",
+    "speakerUrl": "https://github.com/burtonjc",
+    "img": "https://avatars.githubusercontent.com/u/443084?v=3",
+    "handle": "burtonjc",
+    "name": "Jacob",
+    "surname":"Burton",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/tjanczuk",
+    "speakerUrl": "https://github.com/tjanczuk",
+    "img": "https://avatars.githubusercontent.com/u/822369?v=3",
+    "handle": "tjanczuk",
+    "name": "Tomasz",
+    "surname":"Janczuk",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/danjenkins",
+    "speakerUrl": "https://github.com/danjenkins",
+    "img": "https://avatars.githubusercontent.com/u/243117?v=3",
+    "handle": "danjenkins",
+    "name": "Dan",
+    "surname":"Jenkins",
+    "title":"title"
+  },
+  {
+    "apiSpeakerUrl": "https://api.github.com/users/pimterry",
+    "speakerUrl": "https://github.com/pimterry",
+    "img": "https://avatars.githubusercontent.com/u/1526883?v=3",
+    "handle": "pimterry",
+    "name": "Tim",
+    "surname":"Perry",
+    "title":"title"
+  }
+]

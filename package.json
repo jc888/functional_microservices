@@ -22,6 +22,7 @@
     "fluture": "^3.1.1",
     "futurize": "^1.0.2",
     "highland": "^2.10.0",
+    "html-to-text": "^2.1.3",
     "mongo": "^0.1.0",
     "mongodb": "^2.2.10",
     "parallel-future": "0.0.6",

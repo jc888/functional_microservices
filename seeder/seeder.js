@@ -1,7 +1,7 @@
-const { addIndex, assoc, compose, map, tap, chain } = require('ramda');
+const { addIndex, curry, reduce, evolve, assoc, compose, map, tap, chain } = require('ramda');
 const Future = require('fluture');
 const logger = require('../lib/logger');
-
+const htmlToText = require('html-to-text');
 var mongo = require('../mongo');
 var elasticsearch = require('../elasticsearch');
 
@@ -15,6 +15,12 @@ var elasticSearchDocumentify = (index, type) => compose(
 
 // delay :: Number -> v -> Future a v
 var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v), time));
+var stringifyHtml = compose(
+    map(evolve({
+        "title": v => htmlToText.fromString(v, {}),
+        "description": v => htmlToText.fromString(v, {})
+    }))
+);
 
 // seedElasticSearch :: () -> Future e a
 var seedElasticSearch = compose(
@@ -22,13 +28,17 @@ var seedElasticSearch = compose(
     Future.parallel(1),
     map(elasticsearch.upsert),
     elasticSearchDocumentify('function_microservices', 'function_microservices'),
+    stringifyHtml,
     () => require('./data/talks.json')
 );
+
+
 
 // seedMongo :: () -> Future e a
 var seedMongo = compose(
     map(tap(v => console.log('mongo seed complete'))),
-    chain(() => mongo.insert('speakers', require('./data/speakers.json'))),
+    chain(mongo.insert('speakers')),
+    map(() => require('./data/speakers.json')),
     () => mongo.remove('speakers', {})
 )
 
