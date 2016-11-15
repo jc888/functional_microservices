@@ -5,41 +5,40 @@ const logger = require('../lib/logger');
 const mongo = require('../mongo');
 const elasticsearch = require('../elasticsearch');
 
-// joinSpeakersWithTalks :: [[t],[s]] -> [ts]
+// joinSpeakersWithTalks :: [[Talk],[Speaker]] -> [TalkWithSpeaker]
 const joinSpeakersWithTalks = ([talks, speakers]) => {
     const speakerMap = groupBy(prop('name'), speakers);
     return map(r => merge(r, { speaker: head(speakerMap[r.speaker]) }), talks)
 };
 
-// findSpeakers :: query -> Future e [s]
+// findSpeakers :: SpeakerQuery -> Future e [Speaker]
 const findSpeakers = mongo.find('speakers');
 
-// speakerQueryFromTalks :: [t] -> query
+// speakerQueryFromTalks :: [Talk] -> SpeakerQuery
 const speakerQueryFromTalks = compose(
     speakerNames => ({ name: { $in: speakerNames } }),
     pluck('speaker')
 );
 
-// findSpeakersForTalks :: [t] -> Future e [s]
+// findSpeakersForTalks :: [Talk] -> Future e [Speaker]
 const findSpeakersFromTalks = compose(
     findSpeakers,
     speakerQueryFromTalks
 );
 
-// parseResults :: {hits:{hits:[{_source:v}]}} -> [t]
+// parseResults :: {hits:{hits:[{_source:v}]}} -> [Talk]
 const parseResults = compose(pluck('_source'), path(['hits', 'hits']));
 
-// findTalks :: {q:term} -> Future e [t]
+// findTalks :: TalkQuery -> Future e [Talk]
 const findTalks = compose(map(parseResults), elasticsearch.search);
 
 // findSpeakersWithTalks :: [t] -> Future e [[t],[s]]
 const findSpeakersWithTalks = talks => Future.parallel(5, [Future.of(talks), findSpeakersFromTalks(talks)]);
 
-// search :: {q:term} -> Future e [ts]
+// search :: TalkQuery -> Future e [TalkWithSpeaker]
 const search = compose(
     map(joinSpeakersWithTalks),
     chain(findSpeakersWithTalks),
-    map(logger('stuff')),
     findTalks
 );
 

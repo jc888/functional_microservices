@@ -5,7 +5,7 @@ const logger = require('../lib/logger');
 var mongo = require('../mongo');
 var elasticsearch = require('../elasticsearch');
 
-// elasticSearchDocumentify :: (index, type) -> [a] -> [b]
+// elasticSearchDocumentify :: (index, type) -> [Talk] -> [Document]
 var elasticSearchDocumentify = (index, type) => compose(
     map(assoc('index', index)),
     map(assoc('type', type)),
@@ -13,7 +13,7 @@ var elasticSearchDocumentify = (index, type) => compose(
     map(v => ({ body: v }))
 )
 
-// delay :: time -> v -> Future a v
+// delay :: Number -> v -> Future a v
 var delay = time => v => Future((reject, resolve) => setTimeout(() => resolve(v), time));
 
 // seedElasticSearch :: () -> Future e a
