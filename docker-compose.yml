@@ -18,10 +18,10 @@ services:
     container_name: elasticsearch
     ulimits:
       memlock: -1
-    mem_limit: 2g
-    memswap_limit: 2g
+    mem_limit: 1g
+    memswap_limit: 1g
     environment:
-      ES_HEAP_SIZE: 1g
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
       elasticsearch_yml: |
         network.host: 0.0.0.0
         bootstrap.mlockall: true
