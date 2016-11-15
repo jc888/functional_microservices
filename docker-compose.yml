@@ -16,6 +16,15 @@ services:
   elasticsearch:
     image: elasticsearch
     container_name: elasticsearch
+    ulimits:
+      memlock: -1
+    mem_limit: 2g
+    memswap_limit: 2g
+    environment:
+      ES_HEAP_SIZE: 1g
+      elasticsearch_yml: |
+        network.host: 0.0.0.0
+        bootstrap.mlockall: true
     ports:
       - "9200:9200"
       - "9300:9300"
