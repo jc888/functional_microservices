@@ -1,20 +1,16 @@
 const { map } = require('ramda');
-const { Future } = require('ramda-fantasy');
-const rewire = require('rewire');
-const mod = rewire('../handlers/search');
-const sinon = require('sinon');
 
+const chai = require('chai');
+const expect = chai.expect;
+
+const search = require('../handlers/search');
 
 describe('GET /', function() {
-    before(() => {
-        mod.__set__('mongoFind', sinon.stub().returns(Future.of(fakeData)));
-        mod.__set__('search', sinon.stub().returns(Future.of(fakeElasticSearch)));
-    })
-    after(() => {
-        console.log(mod.__get__('mongoFind').callCount);
-    })
-    it('respond with json', function(done) {
-        mod({ q: 'functional' })
-            .fork(done, v => done());
+    it('respond with json', function() {
+        var obj = search.speakerQueryFromTalks([{
+            speaker: "TestName"
+        }]);
+        expect(obj).to.have.property('handle');
+        expect(obj.handle).to.have.property('$in');
     });
 });
