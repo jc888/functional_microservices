@@ -44,6 +44,7 @@
     "title": "Event Driven Architecture",
     "description": "<p>When <a href=\"https://nodejs.org/en/\">Node.Js</a> says &quot;<code>event-driven, non-blocking I/O</code>&quot;, have you ever felt it was some sort of black magic? Well in this talk we&#39;ll <a href=\"https://blog.8thlight.com/uncle-bob/2015/08/06/let-the-magic-die.html\">make the magic go away</a> by implementing our own simple HTTP server, Event Loop, Scheduler, Deferer/Promise and <a href=\"http://screencrush.com/442/files/2016/02/deadpool-2-boyfriend-pic.jpg?w=720&amp;cdnnode=1\">Thread Pool</a>.&#13;&#10;&#13;&#10;Oh, Hi by the way! I&#39;m Lo&iuml;c (it&#39;s pronounced Low-ic), a &quot;Lead Engineer&quot; (read Lead Dev) at <a href=\"http://constant.co/\">Constant Commerce</a>. You&#39;ll find that I <a href=\"https://twitter.com/epiloic\">tweet</a> and <a href=\"http://gnugat.github.io/\">blog</a> a lot about tech. I aslo <a href=\"https://github.com/gnugat\">contribute a bit</a> to FOSS projects.</p>\n",
     "img": "https://avatars.githubusercontent.com/u/793185?v=3",
+    "milestone": "September 28th 2016",
     "speaker": "gnugat",
     "name": "Loïc Faugeron"
 }, {
