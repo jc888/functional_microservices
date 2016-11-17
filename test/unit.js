@@ -5,8 +5,8 @@ const expect = chai.expect;
 
 const search = require('../handlers/search');
 
-describe('GET /', function() {
-    it('respond with json', function() {
+describe('Search module', function() {
+    it('speakerQueryFromTalks fn should transform speakers', function() {
         var obj = search.speakerQueryFromTalks([{
             speaker: "TestName"
         }]);

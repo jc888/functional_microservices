@@ -46,7 +46,7 @@ module.exports = {
     joinSpeakersWithTalks,
     findSpeakers,
     speakerQueryFromTalks,
-    findSpeakersFromTalks,
+    findSpeakersWithTalks,
     parseResults,
     findTalks,
     search
