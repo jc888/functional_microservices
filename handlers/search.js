@@ -11,31 +11,28 @@ const joinSpeakersWithTalks = ([talks, speakers]) => {
     return map(talk => merge(talk, { speaker: head(speakerMap[talk.speaker]) }), talks)
 };
 
-// findSpeakers :: SpeakerQuery -> Future e [Speaker]
-const findSpeakers = mongo.find('speakers');
+// mongoQueryFromTalks :: [Talk] -> SpeakerQuery
+const mongoQueryFromTalks = compose(speakers => ({ handle: { $in: speakers } }), pluck('speaker'));
 
-// speakerQueryFromTalks :: [Talk] -> SpeakerQuery
-const speakerQueryFromTalks = compose(
-    handles => ({ handle: { $in: handles } }),
-    pluck('speaker')
-);
+// searchMongo :: SpeakerQuery -> Future Error [Speaker]
+const searchMongo = mongo.find('speakers');
 
-// findSpeakersFromTalks :: [Talk] -> Future e [Speaker]
-const findSpeakersFromTalks = compose(
-    findSpeakers,
-    speakerQueryFromTalks
-);
+// findSpeakersFromTalks :: [Talk] -> Future Error [Speaker]
+const findSpeakersFromTalks = compose(searchMongo, mongoQueryFromTalks);
 
-// findSpeakersWithTalks :: [Talk] -> Future e [[Talk],[Speaker]]
+// findSpeakersWithTalks :: [Talk] -> Future Error [[Talk],[Speaker]]
 const findSpeakersWithTalks = talks => Future.parallel(5, [Future.of(talks), findSpeakersFromTalks(talks)]);
 
-// parseResults :: {hits:{hits:[{_source:v}]}} -> [Talk]
+// searchElasticSearch :: TalkQuery -> {hits:{hits:[{_source:Talk}]}}
+const searchElasticSearch = elasticsearch.search;
+
+// parseResults :: {hits:{hits:[{_source:Talk}]}} -> [Talk]
 const parseResults = compose(pluck('_source'), path(['hits', 'hits']));
 
-// findTalks :: TalkQuery -> Future e [Talk]
-const findTalks = compose(map(parseResults), elasticsearch.search);
+// findTalks :: TalkQuery -> Future Error [Talk]
+const findTalks = compose(map(parseResults), searchElasticSearch);
 
-// search :: TalkQuery -> Future e [TalkWithSpeaker]
+// search :: TalkQuery -> Future Error [TalkWithSpeaker]
 const search = compose(
     map(joinSpeakersWithTalks),
     chain(findSpeakersWithTalks),
@@ -44,8 +41,8 @@ const search = compose(
 
 module.exports = {
     joinSpeakersWithTalks,
-    findSpeakers,
-    speakerQueryFromTalks,
+    findSpeakersFromTalks,
+    mongoQueryFromTalks,
     findSpeakersWithTalks,
     parseResults,
     findTalks,
