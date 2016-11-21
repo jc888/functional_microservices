@@ -4,16 +4,16 @@ const logger = require('../lib/logger');
 const mongo = require('../mongo');
 const elasticsearch = require('../elasticsearch');
 
-// getSpeakerMap :: [Speaker] -> SpeakerMap
+// getSpeakerMap :: [Speaker] -> {k:Speaker}
 const getSpeakerMap = groupBy(prop('handle'));
 
-// embedSpeaker :: SpeakerMap -> Talk -> TalkEmbeddedWithSpeaker
+// embedSpeaker :: {k:Speaker} -> Talk -> TalkEmbeddedWithSpeaker
 const embedSpeaker = curry((speakerMap, talk) =>
     merge(talk, { speaker: head(speakerMap[talk.speaker]) }));
 
-// joinSpeakersWithTalks :: [[Talk],[Speaker]] -> [TalkEmbeddedWithSpeaker]
-const joinSpeakersWithTalks = ([talks, speakers]) =>
-    map(embedSpeaker(getSpeakerMap(speakers)), talks);
+// joinSpeakersWithTalks :: [Talk] -> {k:Speaker} -> [TalkEmbeddedWithSpeaker]
+const joinSpeakersWithTalks = curry((talks, speakerMap) =>
+    map(embedSpeaker(speakerMap), talks));
 
 // mongoQueryFromTalks :: [Talk] -> SpeakerQuery
 const mongoQueryFromTalks = compose(speakers =>
@@ -25,9 +25,9 @@ const searchMongo = mongo.find('speakers');
 // findSpeakersFromTalks :: [Talk] -> Future Error [Speaker]
 const findSpeakersFromTalks = compose(searchMongo, mongoQueryFromTalks);
 
-// findSpeakersWithTalks :: [Talk] -> Future Error [[Talk],[Speaker]]
-const findSpeakersWithTalks = talks =>
-    compose(map(speakers => ([talks, speakers])), findSpeakersFromTalks)(talks)
+// addSpeakers :: [Talk] -> Future Error [TalkEmbeddedWithSpeaker]
+const addSpeakers = talks =>
+    compose(map(joinSpeakersWithTalks(talks)), map(getSpeakerMap), findSpeakersFromTalks)(talks);
 
 // searchElasticSearch :: TalkQuery -> Future Error {hits:{hits:[{_source:Talk}]}}
 const searchElasticSearch = elasticsearch.search;
@@ -39,20 +39,13 @@ const parseResults = compose(pluck('_source'), path(['hits', 'hits']));
 const findTalks = compose(map(parseResults), searchElasticSearch);
 
 // search :: TalkQuery -> Future Error [TalkEmbeddedWithSpeaker]
-const search = compose(
-    map(joinSpeakersWithTalks),
-    chain(findSpeakersWithTalks),
-    findTalks
-);
-
-
+const search = compose(chain(addSpeakers), findTalks);
 
 
 module.exports = {
     joinSpeakersWithTalks,
     findSpeakersFromTalks,
     mongoQueryFromTalks,
-    findSpeakersWithTalks,
     parseResults,
     findTalks,
     search
