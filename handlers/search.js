@@ -1,15 +1,15 @@
 // @flow
-const { groupBy, curry, compose, map, chain, prop, path, merge, pluck, head } = require('ramda');
+const { indexBy, curry, compose, map, chain, prop, path, merge, pluck, head } = require('ramda');
 const logger = require('../lib/logger');
 const mongo = require('../mongo');
 const elasticsearch = require('../elasticsearch');
 
 // getSpeakerMap :: [Speaker] -> {k:Speaker}
-const getSpeakerMap = groupBy(prop('handle'));
+const getSpeakerMap = indexBy(prop('handle'));
 
 // embedSpeaker :: {k:Speaker} -> Talk -> TalkEmbeddedWithSpeaker
 const embedSpeaker = curry((speakerMap, talk) =>
-    merge(talk, { speaker: head(speakerMap[talk.speaker]) }));
+    merge(talk, { speaker: speakerMap[talk.speaker] }));
 
 // joinSpeakersWithTalks :: [Talk] -> {k:Speaker} -> [TalkEmbeddedWithSpeaker]
 const joinSpeakersWithTalks = curry((talks, speakerMap) =>
@@ -43,10 +43,7 @@ const search = compose(chain(addSpeakers), findTalks);
 
 
 module.exports = {
-    joinSpeakersWithTalks,
-    findSpeakersFromTalks,
-    mongoQueryFromTalks,
-    parseResults,
+    addSpeakers,
     findTalks,
     search
 }

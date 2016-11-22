@@ -12,6 +12,14 @@ const services = require('./handlers').services;
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get('/findTalks', function(req, res) {
+    services.findTalks(req.query)
+        .fork(
+            err => res.status(err.status || 500).send(err.message),
+            r => res.json(r)
+        )
+});
+
 app.post('/findTalks', function(req, res) {
     services.findTalks(req.body)
         .fork(
@@ -20,16 +28,8 @@ app.post('/findTalks', function(req, res) {
         )
 });
 
-app.post('/findSpeakersWithTalks', function(req, res) {
-    services.findSpeakersWithTalks(req.body)
-        .fork(
-            err => res.status(err.status || 500).send(err.message),
-            r => res.json(r)
-        )
-});
-
-app.post('/joinSpeakersWithTalks', function(req, res) {
-    Future.of(services.joinSpeakersWithTalks(req.body))
+app.post('/addSpeakers', function(req, res) {
+    services.addSpeakers(req.body)
         .fork(
             err => res.status(err.status || 500).send(err.message),
             r => res.json(r)
@@ -38,8 +38,7 @@ app.post('/joinSpeakersWithTalks', function(req, res) {
 
 app.get('/', function(req, res) {
     compose(
-        chain(requestWithBody('joinSpeakersWithTalks')),
-        chain(requestWithBody('findSpeakersWithTalks')),
+        chain(requestWithBody('addSpeakers')),
         requestWithBody('findTalks')
     )(req.query).fork(
         err => res.status(err.status || 500).send(err.message),
@@ -53,6 +52,6 @@ var requestWithBody = curry((path, data) => Future((reject, resolve) => {
     });
 }));
 
-app.listen(8080, () => console.log('server started port 8080'));
+app.listen(8080, () => console.log('microservices server started port 8080'));
 
 module.exports = app;
