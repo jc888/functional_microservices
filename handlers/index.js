@@ -1,7 +1,7 @@
 module.exports = {
-    search: require('./search').search,
+    search: require('./search'),
     services: {
-        findTalks: require('./search').findTalks,
-        addSpeakers: require('./search').addSpeakers
+        findTalks: require('./search2').findTalks,
+        addSpeakers: require('./search2').addSpeakers
     }
 }
