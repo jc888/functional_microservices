@@ -43,6 +43,7 @@ const search = compose(chain(addSpeakers), findTalks);
 
 
 module.exports = {
+    mongoQueryFromTalks,
     addSpeakers,
     findTalks,
     search

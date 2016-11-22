@@ -6,8 +6,8 @@ const expect = chai.expect;
 const search = require('../handlers/search');
 
 describe('Search module', function() {
-    it('speakerQueryFromTalks fn should transform speakers', function() {
-        var obj = search.speakerQueryFromTalks([{
+    it('mongoQueryFromTalks fn should transform speakers', function() {
+        var obj = search.mongoQueryFromTalks([{
             speaker: "TestName"
         }]);
         expect(obj).to.have.property('handle');
