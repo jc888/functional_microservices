@@ -1,19 +1,14 @@
 // @flow
-const { indexBy, curry, compose, map, chain, prop, path, merge, pluck, head } = require('ramda');
+const { indexBy, assoc, curry, compose, map, chain, prop, path, merge, pluck, head } = require('ramda');
 const logger = require('../lib/logger');
 const mongo = require('../mongo');
 const elasticsearch = require('../elasticsearch');
 
-// getSpeakerMap :: [Speaker] -> {k:Speaker}
-const getSpeakerMap = indexBy(prop('handle'));
-
-// embedSpeaker :: {k:Speaker} -> Talk -> TalkEmbeddedWithSpeaker
-const embedSpeaker = curry((speakerMap, talk) =>
-    merge(talk, { speaker: speakerMap[talk.speaker] }));
-
-// joinSpeakersWithTalks :: [Talk] -> {k:Speaker} -> [TalkEmbeddedWithSpeaker]
-const joinSpeakersWithTalks = curry((talks, speakerMap) =>
-    map(embedSpeaker(speakerMap), talks));
+// innerJoin :: String -> String -> [a] -> [b] -> [{String:a}]
+const innerJoin = curry((k1, k2, l1, l2) => {
+    var list2Map = indexBy(prop(k2), l2);
+    return map(l1v => assoc(k1, list2Map[l1v[k1]], l1v), l1)
+});
 
 // mongoQueryFromTalks :: [Talk] -> SpeakerQuery
 const mongoQueryFromTalks = compose(speakers =>
@@ -27,7 +22,7 @@ const findSpeakersFromTalks = compose(searchMongo, mongoQueryFromTalks);
 
 // addSpeakers :: [Talk] -> Future Error [TalkEmbeddedWithSpeaker]
 const addSpeakers = talks =>
-    compose(map(joinSpeakersWithTalks(talks)), map(getSpeakerMap), findSpeakersFromTalks)(talks);
+    compose(map(innerJoin('speaker', 'handle', talks)), findSpeakersFromTalks)(talks);
 
 // searchElasticSearch :: TalkQuery -> Future Error {hits:{hits:[{_source:Talk}]}}
 const searchElasticSearch = elasticsearch.search;

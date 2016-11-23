@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const search = require('../handlers/search');
+const search = require('../handlers').services;
 
 describe('Search module', function() {
     it('mongoQueryFromTalks fn should transform speakers', function() {
