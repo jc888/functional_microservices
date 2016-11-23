@@ -1,5 +1,5 @@
 // @flow
-const { indexBy, assoc, curry, compose, map, chain, prop, path, merge, pluck } = require('ramda');
+const { compose, map, chain, path, pluck } = require('ramda');
 const innerJoin = require('../lib/innerJoin');
 const logger = require('../lib/logger');
 const mongo = require('../mongo');
@@ -25,4 +25,4 @@ const findTalks = compose(map(parseResults), elasticsearch.search);
 // search :: TalkQuery -> Future Error [TalkEmbeddedWithSpeaker]
 const search = compose(chain(addSpeakers), findTalks);
 
-module.exports = search
+module.exports = search;
