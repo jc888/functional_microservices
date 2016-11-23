@@ -1,5 +1,3 @@
-const { map } = require('ramda');
-
 const chai = require('chai');
 const expect = chai.expect;
 
